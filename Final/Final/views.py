@@ -32,3 +32,7 @@ def firmar(request):
 def verificar(request):
     t = "request.html"
     return render(request,t)
+
+
+def test():
+    pass
