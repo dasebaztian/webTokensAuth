@@ -4,7 +4,11 @@
 *.pyo
 *.pyd
 __pycache__/
-
+bin/
+include/
+lib/
+pyvenv.cfg
+lib64/
 # Archivos de configuración de entorno virtual
 venv/
 env/
