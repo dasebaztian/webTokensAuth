@@ -1,5 +1,4 @@
 # Archivos de entorno y dependencias
-.env
 *.pyc
 *.pyo
 *.pyd
@@ -18,16 +17,7 @@ env/
 .eggs/
 .Python
 
-# Archivos de bases de datos locales
-db.sqlite3
-*.sqlite3
 
-# Archivos de migraciones (si no son necesarias)
-migrations/
-
-# Archivos estáticos generados
-staticfiles/
-media/
 
 # Archivos de IDEs y editores
 .vscode/
