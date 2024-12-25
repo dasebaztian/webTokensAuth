@@ -16,7 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
+import Final.views as vistas
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', vistas.inicio),
+    path('registro/', vistas.registro),
+    path('login/', vistas.login),
+    path('generar/', vistas.generar),
+    path('firmar/', vistas.firmar),
+    path('verificar/', vistas.verificar),
+    
 ]

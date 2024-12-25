@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block titulo %}Registro{% endblock %}
+
+
+{% block contenido %}
+<form action="/login/" method="POST">
+	 {% csrf_token %}     
+   
+     <div class="mb-3 mt-3">
+	<label for="Usuario">Usuario:</label>
+	<input type="text" class="form-control" id="usuario" placeholder="Ingresa tu usuario" name="usuario">
+     </div>
+
+   
+    <div class="mb-3">
+	<label for="passwd">Contraseña:</label>
+	<input type="password" class="form-control" id="passwd" placeholder="Ingresa tu contraseña" name="passwd">
+    </div>
+    
+  
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+
+{% endblock %}

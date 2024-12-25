@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block titulo %}Registro{% endblock %}
+
+
+{% block contenido %}
+<form action="/firmar" method="POST">
+	<div class="mb-3">
+  		<label for="archivo" class="form-label">Envía tu archivo</label>
+  		<input class="form-control" type="file" id="archivo" name="archivo">
+	</div>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+
+{% endblock %}
