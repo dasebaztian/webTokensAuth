@@ -5,7 +5,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 
 from Final import decoradores
+from . import llavesElipticas as key
 from database.models import Usuario
+
 
 
 def campo_vacio(campo):
@@ -68,6 +70,15 @@ def registro(request):
             ##Validar que el usuario no este registrado
             ##Guardar al usuario
             ##Crear las llaves y encriptarla con la contrseña
+            llavePrivada = key.generar_llave_privada()
+            llavePublica = key.generar_llave_publica(llavePrivada)
+
+            llaveprivada_pem = key.convertir_llave_privada_bytes(llavePrivada)
+            llavepublica_pem = key.convertir_llave_publica_bytes(llavePublica)
+            """ PROBADO, se generó el archivo con la llave
+            with open("./ola", 'wb') as salida_privada:
+                contenido = llaveprivada_pem
+                salida_privada.write(contenido)"""
             return redirect('/login')
 
 def login(request):
