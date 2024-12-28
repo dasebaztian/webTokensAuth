@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 
 from Final import decoradores
-from database import models as Usuarios
+from database.models import Usuario
 
 
 def campo_vacio(campo):
@@ -34,12 +34,16 @@ def registro(request):
     if request.method == 'GET':
         return render(request, t)
     elif request.method == 'POST':
-        errores = []
-        nombre = request.POST.get('nombre', '')
+        errores = [] #Arreglo de errores
+
+        #Obtención de parámetros
+        nombre = request.POST.get('nombre', '') 
         usuario = request.POST.get('usuario', '')
         email = request.POST.get('email', '')
         passwd = request.POST.get('passwd', '')
         passwd2 = request.POST.get('passwd2', '')
+        
+        #Verificación parámetros vacios
         if campo_vacio(nombre):
             errores.append("El nombre no puede estar vacío")
         if campo_vacio(usuario):
@@ -50,6 +54,14 @@ def registro(request):
             errores.append("La contraseña no puede estar vacía")
         if campo_vacio(passwd2):
             errores.append("La confirmación de contraseña no puede estar vacía")
+
+        #verificación del contenido de parametros
+        if not passwd==passwd2:
+            errores.append("Las contraseñas no coinciden")
+        if Usuario.objects.filter(usuario=usuario).exists():
+            errores.append("El usuario ya esta ocupado")
+            
+        #Respuesta ante un error o más de los parámetros
         if errores:
             return render(request, t, {'errores': errores})
         else:
