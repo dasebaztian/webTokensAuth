@@ -4,6 +4,18 @@
 
 
 {% block contenido %}
+{% if errores %}
+<div id="errores" class="alert alert-danger alert-dismissible text-white">
+    
+    <strong>Errores:</strong>
+    <ul id="lista-errores">
+	{% for error in errores %}
+	<li>{{ error }}</li>
+	{% endfor %}
+    </ul>
+</div>
+{% endif %}
+
 <form action="/login/" method="POST">
 	 {% csrf_token %}     
    

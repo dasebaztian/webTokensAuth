@@ -4,31 +4,43 @@
 
 
 {% block contenido %}
+{% if errores %}
+<div id="errores" class="alert alert-danger alert-dismissible text-white">
+    
+    <strong>Errores:</strong>
+    <ul id="lista-errores">
+	{% for error in errores %}
+	<li>{{ error }}</li>
+	{% endfor %}
+    </ul>
+</div>
+{% endif %}
+
 <form action="/registro/" method="POST">
      {% csrf_token %} 
      <div class="mb-3 mt-3">
-	 <label for="nombre">Nombre completo:</label>
-	 <input type="text" class="form-control" id="nombre" placeholder="Ingresa tu nombre completo" name="nombre">
+	 	<label for="nombre">Nombre completo:</label>
+	 	<input type="text" class="form-control" id="nombre" placeholder="Ingresa tu nombre completo" name="nombre">
      </div>
      
      <div class="mb-3 mt-3">
-	<label for="Usuario">Usuario:</label>
-	<input type="text" class="form-control" id="usuario" placeholder="Ingresa tu usuario" name="usuario">
+		<label for="usuario">Usuario:</label>
+		<input type="text" class="form-control" id="usuario" placeholder="Ingresa tu usuario" name="usuario">
      </div>
 
      <div class="mb-3 mt-3">
-	 <label for="email">Correo electronico:</label>
-	 <input type="email" class="form-control" id="email" placeholder="Ingresa tu correo" name="email">
+	 	<label for="email">Correo electronico:</label>
+	 	<input type="email" class="form-control" id="email" placeholder="Ingresa tu correo" name="email">
      </div>
      
     <div class="mb-3">
-	<label for="passwd">Contraseña:</label>
-	<input type="password" class="form-control" id="passwd" placeholder="Ingresa tu contraseña" name="passwd">
+		<label for="passwd">Contraseña:</label>
+		<input type="password" class="form-control" id="passwd" placeholder="Ingresa tu contraseña" name="passwd">
     </div>
     
     <div class="mb-3">
-	<label for="passwd2">Confirmación:</label>
-	<input type="password" class="form-control" id="passwd2" placeholder="Confirma tu contraseña" name="passwd2">
+		<label for="passwd2">Confirmación:</label>
+		<input type="password" class="form-control" id="passwd2" placeholder="Confirma tu contraseña" name="passwd2">
     </div>
     
     <button type="submit" class="btn btn-primary">Submit</button>
