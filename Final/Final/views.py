@@ -74,7 +74,13 @@ def registro(request):
             llavePublica = key.generar_llave_publica(llavePrivada)
 
             llaveprivada_pem = key.convertir_llave_privada_bytes(llavePrivada)
-            llavepublica_pem = key.convertir_llave_publica_bytes(llavePublica)
+            llavepublica_pem = key.convertir_llave_publica_bytes(llavePublica)##Usar para guardalo lavepublica_pem.decode('utf-8') en la base
+
+            llave_aes = key.generar_llave_aes_from_password("") ##Definir que password se usa PARA LA LLAVE AES
+            iv = key.os.urandom(16)##Usar iv.hex() para guardarlo en la base
+            cifrado = key.cifrar(llaveprivada_pem, llave_aes, iv)##Usar cifrado.hex() para guardarlo en la base
+
+
             """ PROBADO, se generó el archivo con la llave
             with open("./ola", 'wb') as salida_privada:
                 contenido = llaveprivada_pem
