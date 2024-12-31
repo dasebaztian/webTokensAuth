@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 
 from Final import decoradores
 from . import llavesElipticas as key
+from . import hasher as hash
 from database.models import Usuario
 
 
@@ -70,21 +71,22 @@ def registro(request):
             ##Validar que el usuario no este registrado
             ##Guardar al usuario
             ##Crear las llaves y encriptarla con la contrseña
+
+            salt_password_bd = key.os.urandom(16)##Guardarlo como binario en la base
+            passwdHasheado =  hash.hashearPassword(passwd, salt_password_bd)##Guardarlo en la base como char
+
             llavePrivada = key.generar_llave_privada()
             llavePublica = key.generar_llave_publica(llavePrivada)
 
             llaveprivada_pem = key.convertir_llave_privada_bytes(llavePrivada)
-            llavepublica_pem = key.convertir_llave_publica_bytes(llavePublica)##Usar para guardalo lavepublica_pem.decode('utf-8') en la base
+            llavepublica_pem = key.convertir_llave_publica_bytes(llavePublica)##Guardar como char en la base .decode('utf-8')
 
-            llave_aes = key.generar_llave_aes_from_password("") ##Definir que password se usa PARA LA LLAVE AES
-            iv = key.os.urandom(16)##Usar iv.hex() para guardarlo en la base
-            cifrado = key.cifrar(llaveprivada_pem, llave_aes, iv)##Usar cifrado.hex() para guardarlo en la base
+            llave_aes = key.generar_llave_aes_from_password(passwdHasheado)###Guardar como binario en la base???
+            ###si se genera con el hash del password tal vez no sea necesario guardarlo
+            
+            iv = key.os.urandom(16)##Guardar como binario en la base, debe cambiarse cuando se soliciten nuevas llaves
+            llavePrivada_cifrada = key.cifrar(llaveprivada_pem, llave_aes, iv)##Guardar como binario en la base
 
-
-            """ PROBADO, se generó el archivo con la llave
-            with open("./ola", 'wb') as salida_privada:
-                contenido = llaveprivada_pem
-                salida_privada.write(contenido)"""
             return redirect('/login')
 
 def login(request):
