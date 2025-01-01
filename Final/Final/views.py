@@ -63,6 +63,8 @@ def registro(request):
             errores.append("Las contraseñas no coinciden")
         if Usuario.objects.filter(usuario=usuario).exists():
             errores.append("El usuario ya esta ocupado")
+        if Usuario.objects.filter(correo=email).exists():    
+            errores.append("El correo ya está registrado")
             
         #Respuesta ante un error o más de los parámetros
         if errores:
@@ -81,17 +83,52 @@ def registro(request):
             llaveprivada_pem = key.convertir_llave_privada_bytes(llavePrivada)
             llavepublica_pem = key.convertir_llave_publica_bytes(llavePublica)##Guardar como char en la base .decode('utf-8')
 
-            llave_aes = key.generar_llave_aes_from_password(passwdHasheado)###Guardar como binario en la base???
-            ###si se genera con el hash del password tal vez no sea necesario guardarlo
-            
+            llave_aes = key.generar_llave_aes_from_password(passwdHasheado)            
             iv = key.os.urandom(16)##Guardar como binario en la base, debe cambiarse cuando se soliciten nuevas llaves
             llavePrivada_cifrada = key.cifrar(llaveprivada_pem, llave_aes, iv)##Guardar como binario en la base
 
+            usuario_nuevo = Usuario(
+                usuario=usuario,
+                nombre=nombre,
+                correo=email,
+                salt_passwd=salt_password_bd,
+                passwd=passwdHasheado,
+                pubkey=llavepublica_pem.decode('utf-8'),
+                privkey=llavePrivada_cifrada,
+                iv=iv
+            )
+            usuario_nuevo.save()
             return redirect('/login')
 
 def login(request):
     t = "login.html"
-    return render(request,t)
+    if request.method == 'GET':
+        return render(request, 'login.html')
+    elif request.method == 'POST':
+        usuario = request.POST.get('usuario','')
+        password = request.POST.get('passwd','')
+        
+        if not usuario or not password:
+            errores = [] #Arreglo de errores
+            errores.append('El usuario o contraseña no pueden estar vacíos')
+            return render(request, 'login.html', {'errores': errores})
+        try:
+            usuario_bd = Usuario.objects.get(usuario=usuario)
+            salt_bd = usuario_bd.salt_passwd
+            passwd_bd = usuario_bd.passwd
+
+            if hash.verificarPassword(password,passwd_bd, salt_bd):
+                request.session['logueado'] = True
+                return redirect('/firmar')
+            else:
+                errores = []
+                errores.append("Usuario y/o Contraseña incorrectos")
+                return render(request, 'login.html', {'errores': errores})
+        except:
+            errores = []
+            errores.append('Usuario y/o Contraseña incorrectos')
+            return render(request, 'login.html', {'errores': errores})
+        
 
 @decoradores.login_requerido
 def generar(request):
