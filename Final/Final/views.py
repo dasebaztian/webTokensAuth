@@ -14,24 +14,12 @@ from database.models import Usuario
 def campo_vacio(campo):
     return campo.strip() == ''
 
-def inicio(request):
-    t = "base.html"
-    if request.method == 'GET':
-        return render(request,t)
-    elif request.method == 'POST':
-        errores = []
-        usuario = request.POST.get('usuario', '')
-        passwd = request.POST.get('passwd', '')
-        if campo_vacio(usuario):
-            errores.append("El usuario no puede estar vacío")
-        if campo_vacio(passwd):
-            errores.append("La contraseña no puede estar vacía")
-        if errores:
-            return render(request, t, {'errores': errores})
-        else:
-            pass
-        ##Crear la sesión 
-            
+def validar_campo(campo):
+    if not re.match(r'^[a-zA-Z0-9_-]+$', campo):
+        return False
+    return True
+        
+    
 def registro(request):
     t = "registro.html"
     if request.method == 'GET':
@@ -57,6 +45,16 @@ def registro(request):
             errores.append("La contraseña no puede estar vacía")
         if campo_vacio(passwd2):
             errores.append("La confirmación de contraseña no puede estar vacía")
+
+        ##Validación de carácteres especiales
+        if validar_campo(nombre):
+            errores.append("El nombre no puede contener carácteres especiales")
+        if validar_campo(usuario):
+            errores.append("El usuario no puede contener carácters especiales")
+        if validar_campo(passwd):
+            errorores.append("La contraseña no puede contener carácteres especiales")
+        if validar_campo(passwd2):
+            errores.append("La confirmación de contraseña no puede contener carácteres espeiales")
 
         #verificación del contenido de parametros
         if not passwd==passwd2:
@@ -102,32 +100,36 @@ def registro(request):
 
 def login(request):
     t = "login.html"
+    errores = []
     if request.method == 'GET':
         return render(request, 'login.html')
     elif request.method == 'POST':
         usuario = request.POST.get('usuario','')
-        password = request.POST.get('passwd','')
-        
-        if not usuario or not password:
-            errores = [] #Arreglo de errores
-            errores.append('El usuario o contraseña no pueden estar vacíos')
-            return render(request, 'login.html', {'errores': errores})
-        try:
-            usuario_bd = Usuario.objects.get(usuario=usuario)
-            salt_bd = usuario_bd.salt_passwd
-            passwd_bd = usuario_bd.passwd
+        passwd = request.POST.get('passwd','')
 
-            if hash.verificarPassword(password,passwd_bd, salt_bd):
-                request.session['logueado'] = True
-                return redirect('/firmar')
-            else:
-                errores = []
-                errores.append("Usuario y/o Contraseña incorrectos")
-                return render(request, 'login.html', {'errores': errores})
-        except:
-            errores = []
-            errores.append('Usuario y/o Contraseña incorrectos')
+        if campo_vacio(usuario):
+            errores.append("El usuario no puede estar vacío")
+        if campo_vacio(passwd):
+            errores.append("La contraseña no puede estar vacía")
+        if not usuario or not passwd:
+            errores.append('El usuario o contraseña no pueden estar vacíos')
+        if errores:
             return render(request, 'login.html', {'errores': errores})
+        else:
+            try:
+                usuario_bd = Usuario.objects.get(usuario=usuario)
+                salt_bd = usuario_bd.salt_passwd
+                passwd_bd = usuario_bd.passwd
+
+                if hash.verificarPassword(passwd,passwd_bd, salt_bd):
+                    request.session['logueado'] = True
+                    return redirect('/firmar')
+                else:
+                    errores.append("Usuario y/o Contraseña incorrectos")
+                    return render(request, 'login.html', {'errores': errores})
+            except:
+                errores.append('Usuario y/o Contraseña incorrectos')
+                return render(request, 'login.html', {'errores': errores})
         
 
 @decoradores.login_requerido

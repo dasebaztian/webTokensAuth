@@ -19,7 +19,7 @@ from django.urls import path
 from Final import views as vistas
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', vistas.inicio),
+    path('', vistas.login),
     path('registro/', vistas.registro),
     path('login/', vistas.login),
     path('generar/', vistas.generar),
