@@ -14,9 +14,10 @@ def campo_vacio(campo):
     return campo.strip() == ''
 
 def validar_campo(campo):
-    if not re.match(r'^[a-zA-Z0-9_-]+$', campo):
+    if re.match(r'^[a-zA-Z0-9_-]+$', campo):
         return False
-    return True
+    else:
+        return True
         
     
 def registro(request):
