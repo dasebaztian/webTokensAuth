@@ -3,6 +3,7 @@ from django.template import Template, Context
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 
+import re
 from Final import decoradores
 from . import llavesElipticas as key
 from . import hasher as hash
@@ -50,7 +51,7 @@ def registro(request):
         if validar_campo(usuario):
             errores.append("El usuario no puede contener carácters especiales")
         if validar_campo(passwd):
-            errorores.append("La contraseña no puede contener carácteres especiales")
+            errores.append("La contraseña no puede contener carácteres especiales")
         if validar_campo(passwd2):
             errores.append("La confirmación de contraseña no puede contener carácteres espeiales")
 
