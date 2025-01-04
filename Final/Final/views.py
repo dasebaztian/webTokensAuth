@@ -123,6 +123,7 @@ def login(request):
 
                 if hash.verificarPassword(passwd,passwd_bd, salt_bd):
                     request.session['logueado'] = True
+                    request.session['usuario'] = usuario
                     return redirect('/firmar')
                 else:
                     errores.append("Usuario y/o Contraseña incorrectos")
@@ -141,6 +142,31 @@ def generar(request):
 def firmar(request):
     t = "firmar.html"
     return render(request,t)
+
+@decoradores.login_requerido
+def priv(request):
+    t = "firmar.html"
+    return render(request,t)
+
+@decoradores.login_requerido
+def publ(request):
+    if request.method == 'POST':
+        usuario = request.session.get('usuario')  # Obtener el nombre de usuario desde la sesión
+        try:
+            # Buscar al usuario en la base de datos
+            usuario_bd = Usuario.objects.get(usuario=usuario)
+            pubkey = usuario_bd.pubkey
+
+            # Crear una respuesta HTTP para la descarga de la llave privada
+            response = HttpResponse(pubkey, content_type='application/octet-stream')
+            response['Content-Disposition'] = f'attachment; filename={usuario}_public_key.pem'
+
+            return response
+        except Usuario.DoesNotExist:
+            # Si no se encuentra el usuario
+            return render(request, 'login.html')
+    else:
+        return render(request, 'login.html')
 
 @decoradores.login_requerido
 def verificar(request):
