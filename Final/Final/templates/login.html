@@ -16,18 +16,24 @@
 </div>
 {% endif %}
 
-<form action="/login/" method="POST">
+<form class="was-validated" action="/login/" method="POST">
 	 {% csrf_token %}     
    
      <div class="mb-3 mt-3">
 	<label for="Usuario">Usuario:</label>
-	<input type="text" class="form-control" id="usuario" placeholder="Ingresa tu usuario" name="usuario">
+	<input type="text" class="form-control" id="usuario" placeholder="Ingresa tu usuario" name="usuario" pattern="[a-zA-Z0-9 _-]+" required>
+    <div class="valid-feedback">¡OK!</div>
+    <div class="invalid-feedback">El username es obligatorio y no debe contener caracteres especiales</div>
+     </div>
      </div>
 
    
     <div class="mb-3">
 	<label for="passwd">Contraseña:</label>
-	<input type="password" class="form-control" id="passwd" placeholder="Ingresa tu contraseña" name="passwd">
+	<input type="password" class="form-control" id="passwd" placeholder="Ingresa tu contraseña" name="passwd" pattern="[a-zA-Z0-9 _-]+" required>
+    <div class="valid-feedback">¡OK!</div>
+    <div class="invalid-feedback">Asegurate de ingresar tu contraseña de forma correcta</div>
+     </div>
     </div>
     
   
