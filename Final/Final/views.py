@@ -1,4 +1,3 @@
-
 from django.http import HttpResponse, JsonResponse
 from django.template import Template, Context
 from django.views.decorators.csrf import csrf_exempt
@@ -8,7 +7,6 @@ from Final import decoradores
 from . import llavesElipticas as key
 from . import hasher as hash
 from database.models import Usuario
-
 
 
 def campo_vacio(campo):
