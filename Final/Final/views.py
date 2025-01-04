@@ -14,7 +14,7 @@ def campo_vacio(campo):
     return campo.strip() == ''
 
 def validar_campo(campo):
-    if re.match(r'^[a-zA-Z0-9_-]+$', campo):
+    if re.match(r'^[a-zA-Z0-9 _-]+$', campo):
         return False
     else:
         return True
