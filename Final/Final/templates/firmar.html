@@ -21,8 +21,14 @@
     </form>
 
     <form action="/descargar_llave_privada/" method="POST" class="mx-2">
-        {% csrf_token %}
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="passwd" class="form-label">Ingresa tu contraseña</label>
+        <input class="form-control" type="password" id="passwd" name="passwd" required>
+    </div>
+    <div class="d-flex justify-content-center">
         <button type="submit" class="btn btn-secondary">Descarga tu llave privada</button>
+    </div>
     </form>
 </div>
 

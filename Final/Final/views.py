@@ -145,8 +145,31 @@ def firmar(request):
 
 @decoradores.login_requerido
 def priv(request):
-    t = "firmar.html"
-    return render(request,t)
+    if request.method == 'POST':
+        usuario = request.session.get('usuario')  # Obtener el nombre de usuario desde la sesión
+        passwd = request.POST.get('passwd')  # Obtener la contraseña proporcionada en el formulario
+        try:
+            # Buscar al usuario en la base de datos
+            usuario_bd = Usuario.objects.get(usuario=usuario)
+            privkey_cifrada = usuario_bd.privkey
+            salt_bd = usuario_bd.salt_passwd
+            passwd_bd = usuario_bd.passwd
+
+            # Verificar la contraseña
+            if hash.verificarPassword(passwd, passwd_bd, salt_bd):
+                llavePrivada_pem = key.descifrar(privkey_cifrada, key.generar_llave_aes_from_password(passwd_bd), usuario_bd.iv)
+                response = HttpResponse(llavePrivada_pem, content_type='application/octet-stream')
+                response['Content-Disposition'] = f'attachment; filename={usuario}_private_key.pem'
+                return response
+            else:
+                #Deberiamos cerrar la sesión?
+                return render(request, 'login.html', {'errores': ['Contraseña incorrecta']})
+
+        except Usuario.DoesNotExist:
+            #FALTA CONTROL DE TEMPLATES AQUÍ
+            return render(request, 'login.html', {'errores': ['Usuario no encontrado']})
+    else:
+        return render(request, 'login.html')
 
 @decoradores.login_requerido
 def publ(request):
