@@ -3,6 +3,12 @@ from django.template import Template, Context
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 
+
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives import hashes
+from cryptography.exceptions import InvalidSignature
+
 import re
 from Final import decoradores
 from . import llavesElipticas as key
@@ -140,6 +146,7 @@ def generar(request):
 
 @decoradores.login_requerido
 def firmar(request):
+    t = "firmar.html"
     if request.method == 'POST':
         usuario = request.session('usuario')
         passwd = request.POST.get('passwd')
@@ -151,58 +158,18 @@ def firmar(request):
             passwd_bd = usuario_bd.passwd
             if hash.verificarPassword(passwd, passwd_bd, salt_bd):
                 llavePrivada_pem = key.descifrar(privkey_cifrada, key.generar_llave_aes_from_password(passwd_bd), usuario_bd.iv)
-                
-                
-    t = "firmar.html"
-    return render(request,t)
-
-@decoradores.login_requerido
-def priv(request):
-    if request.method == 'POST':
-        usuario = request.session.get('usuario')  # Obtener el nombre de usuario desde la sesión
-        passwd = request.POST.get('passwd')  # Obtener la contraseña proporcionada en el formulario
-        try:
-            # Buscar al usuario en la base de datos
-            usuario_bd = Usuario.objects.get(usuario=usuario)
-            privkey_cifrada = usuario_bd.privkey
-            salt_bd = usuario_bd.salt_passwd
-            passwd_bd = usuario_bd.passwd
-
-            # Verificar la contraseña
-            if hash.verificarPassword(passwd, passwd_bd, salt_bd):
-                llavePrivada_pem = key.descifrar(privkey_cifrada, key.generar_llave_aes_from_password(passwd_bd), usuario_bd.iv)
-                response = HttpResponse(llavePrivada_pem, content_type='application/octet-stream')
+                datos_binarios = archivo.read()
+                signature = llavePrivada_pem.sign(datos_binarios,
+                             ec.ECDSA(hashes.SHA256()))
+                response = HttpResponse(signature, content_type='application/octet-stream')
                 response['Content-Disposition'] = f'attachment; filename={usuario}_private_key.pem'
                 return response
             else:
-                #Deberiamos cerrar la sesión?
-                return render(request, 'login.html', {'errores': ['Contraseña incorrecta']})
-
+                return render(request, t, {'errores': ['Contraseña incorrecta']})
         except Usuario.DoesNotExist:
-            #FALTA CONTROL DE TEMPLATES AQUÍ
             return render(request, 'login.html', {'errores': ['Usuario no encontrado']})
     else:
-        return render(request, 'login.html')
-
-@decoradores.login_requerido
-def publ(request):
-    if request.method == 'POST':
-        usuario = request.session.get('usuario')  # Obtener el nombre de usuario desde la sesión
-        try:
-            # Buscar al usuario en la base de datos
-            usuario_bd = Usuario.objects.get(usuario=usuario)
-            pubkey = usuario_bd.pubkey
-
-            # Crear una respuesta HTTP para la descarga de la llave privada
-            response = HttpResponse(pubkey, content_type='application/octet-stream')
-            response['Content-Disposition'] = f'attachment; filename={usuario}_public_key.pem'
-
-            return response
-        except Usuario.DoesNotExist:
-            # Si no se encuentra el usuario
-            return render(request, 'login.html')
-    else:
-        return render(request, 'login.html')
+        return render(request,t)
 
 @decoradores.login_requerido
 def verificar(request):
