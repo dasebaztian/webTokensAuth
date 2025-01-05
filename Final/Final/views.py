@@ -1,18 +1,14 @@
+from asyncio import sleep
 from django.http import HttpResponse, JsonResponse
 from django.template import Template, Context
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 
-
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives import hashes
-from cryptography.exceptions import InvalidSignature
-
 import re
 from Final import decoradores
 from . import llavesElipticas as key
 from . import hasher as hash
+from . import firmas as firm
 from database.models import Usuario
 
 
@@ -29,6 +25,8 @@ def validar_campo(campo):
 def registro(request):
     t = "registro.html"
     if request.method == 'GET':
+        request.session['logueado'] = False
+        request.session['usuario'] = ''
         return render(request, t)
     elif request.method == 'POST':
         errores = [] #Arreglo de errores
@@ -108,6 +106,8 @@ def login(request):
     t = "login.html"
     errores = []
     if request.method == 'GET':
+        request.session['logueado'] = False
+        request.session['usuario'] = ''
         return render(request, 'login.html')
     elif request.method == 'POST':
         usuario = request.POST.get('usuario','')
@@ -148,29 +148,47 @@ def generar(request):
 def firmar(request):
     t = "firmar.html"
     if request.method == 'POST':
-        usuario = request.session['usuario']
+        usuario = request.session.get('usuario')
         passwd = request.POST.get('passwd')
-        archivo = request.FILES['archivo']
+        archivo = request.FILES.get('archivo')
+
+        if not usuario or not archivo:
+            return render(request, t, {'errores': ['Faltan datos requeridos']})
+
         try:
             usuario_bd = Usuario.objects.get(usuario=usuario)
             privkey_cifrada = usuario_bd.privkey
+            pubkey = usuario_bd.pubkey
             salt_bd = usuario_bd.salt_passwd
             passwd_bd = usuario_bd.passwd
+
             if hash.verificarPassword(passwd, passwd_bd, salt_bd):
-                llavePrivada_pem = key.descifrar(privkey_cifrada, key.generar_llave_aes_from_password(passwd_bd), usuario_bd.iv)
-                llavePrivada = key.convertir_bytes_llave_privada(llavePrivada_pem)
-                datos_binarios = archivo.read()
-                signature = llavePrivada.sign(datos_binarios,
-                             ec.ECDSA(hashes.SHA256()))
-                response = HttpResponse(signature, content_type='application/octet-stream')
-                response['Content-Disposition'] = f'attachment; filename={archivo}_sign.sig'
+                llavePrivada_pem = key.descifrar(
+                    privkey_cifrada,
+                    key.generar_llave_aes_from_password(passwd_bd),
+                    usuario_bd.iv
+                )
+                privkey_tipo_llave = key.convertir_bytes_llave_privada(llavePrivada_pem)
+
+                # Leer el archivo subido
+                archivo_bytes = archivo.read()
+
+                # Firmar el archivo
+                firma = firm.firmado(privkey_tipo_llave, archivo_bytes)
+
+                # Preparar respuesta para descarga
+                response = HttpResponse(firma, content_type='application/octet-stream')
+                response['Content-Disposition'] = f'attachment; filename={archivo.name}_sign.sig'
                 return response
             else:
                 return render(request, t, {'errores': ['Contraseña incorrecta']})
+
         except Usuario.DoesNotExist:
             return render(request, 'login.html', {'errores': ['Usuario no encontrado']})
+        except Exception as e:
+            return render(request, t, {'errores': [f'Error inesperado: {str(e)}']})
     else:
-        return render(request,t)
+        return render(request, t)
 
 @decoradores.login_requerido
 def verificar(request):
