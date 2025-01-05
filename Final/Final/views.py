@@ -174,6 +174,25 @@ def firmar(request):
 
 @decoradores.login_requerido
 def verificar(request):
-    t = "request.html"
-    return render(request,t)
+    t = "verificar.html"
+    if request.method == 'POST':
+        archivo = request.FILES['archivo']
+        signature = request.FILES['firma']
+        usuario = request.POST.get('usuario', '')
+        
+        archivo_binario = archivo.read()
+        signature_binario = signature.read()
+        
+        if Usuario.objects.get(usuario=usuario):
+            usuario_bd = Usuario.objects.get(usuario=usuario)
+            llavePublica_pem = usuario_bd.pubkey.encode('utf-8')
+            llavePublica = key.convertir_bytes_llave_publica(llavePublica_pem)
+            if llavePublica.verify(signature_binario, archivo_binario, ec.ECDSA(hashes.SHA256())):
+                return render(request, t, {'success': ['Las firmas coinciden, archivo verificado']})
+            else:
+                return render(request, t, {'errores': ['Las firmas no coinciden']})
+        else:
+            return render(request, t, {'errores': ['No existe ese usuario']})
+    else:
+        return render(request,t)
 

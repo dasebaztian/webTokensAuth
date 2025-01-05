@@ -16,15 +16,27 @@
 </div>
 {% endif %}
 
-<form action="/firmar/" method="POST" enctype="multipart/form-data">
+{% if success %}
+<div class="alert alert-success">
+    {% for alert in success %}
+    <strong>Verificado!</strong> {{ alert }}
+    {% endfor %}
+</div>
+{% endif %}
+
+<form action="/verificar/" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="mb-3">
   	<label for="archivo" class="form-label">Envía tu archivo</label>
   	<input class="form-control" type="file" id="archivo" name="archivo">
     </div>
+    <div>
+	<label for="firma" class="form-label">Envía tu arcivo de firma</label>
+  	<input class="form-control" type="file" id="firma" name="firma">
+    </div>
     <div class="mb-3">
-	<label for="passwd" class="form-label">Ingresa tu contraseña</label>
-	<input class="form-control" type="password" id="passwd" name="passwd" required>
+	<label for="usuario" class="form-label">Ingresa el usuario</label>
+	<input class="form-control" type="text" id="usuario" name="usuario" required>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
     </div>

@@ -44,6 +44,13 @@ def convertir_bytes_llave_privada(contenido_texto):
         backend=default_backend(),
         password=None)
     return resultado
+
+def convertir_bytes_llave_publica(contenido_texto):
+    resultado = serialization.load_pem_public_key(
+        contenido_texto,
+        backend=default_backend())
+    return resultado
+
 ##Encriptado
 def generar_llave_aes_from_password(password):
     password = password.encode('utf-8')
