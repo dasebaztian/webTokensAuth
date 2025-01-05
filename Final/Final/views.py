@@ -197,10 +197,11 @@ def verificar(request):
         archivo = request.FILES['archivo']
         signature = request.FILES['firma']
         usuario = request.POST.get('usuario', '')
-        
+
         archivo_binario = archivo.read()
         signature_binario = signature.read()
-        if Usuario.objects.get(usuario=usuario):
+
+        try:
             usuario_bd = Usuario.objects.get(usuario=usuario)
             llavePublica_pem = usuario_bd.pubkey.encode('utf-8')
             llavePublica = key.convertir_bytes_llave_publica(llavePublica_pem)
@@ -209,8 +210,8 @@ def verificar(request):
                 return render(request, t, {'success': ['Las firmas coinciden, archivo verificado']})
             else:
                 return render(request, t, {'errores': ['Las firmas no coinciden']})
-        else:
+        except Usuario.DoesNotExist:
             return render(request, t, {'errores': ['No existe ese usuario']})
     else:
-        return render(request,t)
+        return render(request, t)
 
