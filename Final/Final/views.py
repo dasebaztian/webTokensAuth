@@ -140,6 +140,19 @@ def generar(request):
 
 @decoradores.login_requerido
 def firmar(request):
+    if request.method == 'POST':
+        usuario = request.session('usuario')
+        passwd = request.POST.get('passwd')
+        archivo = request.FILES['archivo']
+        try:
+            usuario_bd = Usuario.objects.get(usuario=usuario)
+            privkey_cifrada = usuario_bd.privkey
+            salt_bd = usuario_bd.salt_passwd
+            passwd_bd = usuario_bd.passwd
+            if hash.verificarPassword(passwd, passwd_bd, salt_bd):
+                llavePrivada_pem = key.descifrar(privkey_cifrada, key.generar_llave_aes_from_password(passwd_bd), usuario_bd.iv)
+                
+                
     t = "firmar.html"
     return render(request,t)
 
