@@ -148,7 +148,7 @@ def generar(request):
 def firmar(request):
     t = "firmar.html"
     if request.method == 'POST':
-        usuario = request.session('usuario')
+        usuario = request.session['usuario']
         passwd = request.POST.get('passwd')
         archivo = request.FILES['archivo']
         try:
@@ -158,11 +158,12 @@ def firmar(request):
             passwd_bd = usuario_bd.passwd
             if hash.verificarPassword(passwd, passwd_bd, salt_bd):
                 llavePrivada_pem = key.descifrar(privkey_cifrada, key.generar_llave_aes_from_password(passwd_bd), usuario_bd.iv)
+                llavePrivada = key.convertir_bytes_llave_privada(llavePrivada_pem)
                 datos_binarios = archivo.read()
-                signature = llavePrivada_pem.sign(datos_binarios,
+                signature = llavePrivada.sign(datos_binarios,
                              ec.ECDSA(hashes.SHA256()))
                 response = HttpResponse(signature, content_type='application/octet-stream')
-                response['Content-Disposition'] = f'attachment; filename={usuario}_private_key.pem'
+                response['Content-Disposition'] = f'attachment; filename={archivo}_sign.sig'
                 return response
             else:
                 return render(request, t, {'errores': ['Contraseña incorrecta']})

@@ -25,6 +25,4 @@ urlpatterns = [
     path('generar/', vistas.generar),
     path('firmar/', vistas.firmar),
     path('verificar/', vistas.verificar),
-    path('descargar_llave_publica/', vistas.publ),
-    path('descargar_llave_privada/', vistas.priv),
 ]

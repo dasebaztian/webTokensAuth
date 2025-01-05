@@ -4,7 +4,7 @@
 
 
 {% block contenido %}
-<form action="/firmar/" method="POST">
+<form action="/firmar/" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="mb-3">
   	<label for="archivo" class="form-label">Envía tu archivo</label>
