@@ -1,5 +1,10 @@
 from django.db import models
+from datetime import timedelta
+from django.utils import timezone
 
+
+def default_expiration():
+    return timezone.localtime(timezone.now()) + timedelta(minutes=5)
 # Create your models here.
 class Usuario(models.Model):
     usuario = models.CharField(max_length=20, unique=True)
@@ -13,4 +18,4 @@ class Usuario(models.Model):
     iv = models.BinaryField(default=b'')
 
     #Campo para validar el tiempo de expiración
-    date_expire_key = models.DateTimeField(null=True, blank=True)
+    date_expire_key = models.DateTimeField(default=default_expiration)

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block titulo %}Generar llaves{% endblock %}
+
+{% block contenido %}
+{% if errores %}
+<div id="errores" class="alert bg-secondary text-dark alert-dismissible text-white">
+    <strong>Errores:</strong>
+    <ul id="lista-errores">
+        {% for error in errores %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if success %}
+<div class="alert alert-success">
+    {% for alert in success %}
+    <strong>Verificado!</strong> {{ alert }}
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if usuario and expiration_date %}
+<div class="alert alert-info">
+    <strong>Hola {{ usuario }}!</strong> Bienvenido a la página de generación de llaves.<br>
+    <strong>Fecha de renovación automatica de tus llaves:</strong> {{ expiration_date|date:"d-m-Y H:i:s" }}
+</div>
+{% endif %}
+
+<form action="/generar/" method="POST">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="password" class="form-label">Ingresa tu contraseña</label>
+        <input class="form-control" type="password" id="password" name="passwd" required>
+    </div>
+    <div class="mb-3">
+        <label for="confirm_password" class="form-label">Confirma tu contraseña</label>
+        <input class="form-control" type="password" id="confirm_password" name="passwd2" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}
