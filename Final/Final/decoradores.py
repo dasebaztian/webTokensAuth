@@ -31,7 +31,7 @@ def login_y_verificar_llaves(vista):
                     usuario_bd.privkey = llavePrivada_cifrada
                     usuario_bd.pubkey = llavepublica_pem.decode('utf-8')
                     usuario_bd.iv = iv
-                    usuario_bd.date_expire_key = timezone.localtime(timezone.now() + timedelta(minutes=5))
+                    usuario_bd.date_expire_key = timezone.localtime(timezone.now() + timedelta(minutes=10))
                     usuario_bd.save()
             except Usuario.DoesNotExist:
                 # Si el usuario no existe, redirigir al login
