@@ -178,7 +178,7 @@ def login(request):
                 return render(request, 'login.html', {'errores': errores})
         
 
-@decoradores.login_requerido
+@decoradores.login_y_verificar_llaves
 def generar(request):
     t = "generar.html"
     
@@ -216,7 +216,7 @@ def generar(request):
                 llave_aes = key.generar_llave_aes_from_password(passwdHasheado)
                 iv = key.os.urandom(16)
                 llavePrivada_cifrada = key.cifrar(llaveprivada_pem, llave_aes, iv)
-                hora_local = timezone.localtime(timezone.now() + timedelta(minutes=5))
+                hora_local = timezone.localtime(timezone.now() + timedelta(minutes=10))
 
                 usuario_bd.privkey = llavePrivada_cifrada
                 usuario_bd.pubkey = llavepublica_pem.decode('utf-8')
@@ -250,7 +250,7 @@ def generar(request):
 
     
 
-@decoradores.login_requerido
+@decoradores.login_y_verificar_llaves
 def firmar(request):
     t = "firmar.html"
     if request.method == 'POST':
@@ -296,7 +296,7 @@ def firmar(request):
     else:
         return render(request, t)
 
-@decoradores.login_requerido
+@decoradores.login_y_verificar_llaves
 def verificar(request):
     t = "verificar.html"
     if request.method == 'POST':

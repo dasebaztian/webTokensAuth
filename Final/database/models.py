@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 def default_expiration():
-    return timezone.localtime(timezone.now()) + timedelta(minutes=5)
+    return timezone.localtime(timezone.now()) + timedelta(minutes=10)
 # Create your models here.
 class Usuario(models.Model):
     usuario = models.CharField(max_length=20, unique=True)
