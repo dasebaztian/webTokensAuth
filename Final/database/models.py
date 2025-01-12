@@ -11,6 +11,3 @@ class Usuario(models.Model):
     pubkey = models.CharField(max_length=215)
     privkey = models.BinaryField(default=b'')
     iv = models.BinaryField(default=b'')
-
-    #Campo para validar el tiempo de expiración
-    date_expire_key = models.DateTimeField(null=True, blank=True)

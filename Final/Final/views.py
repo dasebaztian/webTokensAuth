@@ -3,8 +3,6 @@ from django.http import HttpResponse, JsonResponse
 from django.template import Template, Context
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
-from django.utils import timezone
-from datetime import timedelta
 
 import re
 from Final import decoradores
@@ -102,8 +100,6 @@ def registro(request):
                 iv=iv
             )
             usuario_nuevo.save()
-
-            ##Invocar la funcion generar_llaves_temporales para guardar la fecha de expiracion o cambiar el resto por la nueva funcion
             return redirect('/login')
 
 def login(request):
@@ -219,36 +215,3 @@ def verificar(request):
     else:
         return render(request, t)
 
-#Generar las llaves con los 10 minutos
-def generar_llaves_temporales(name_user):
-    
-    try:
-        user = Usuario.objects.get(usuario=name_user)
-    except Usuario.DoesNotExist:
-        return "Usuario no encontrado"
-
-    llave_privada = key.generar_llave_privada()
-    llave_publica = key.generar_llave_publica(llave_privada)
-
-    llave_privada_bytes = key.convertir_llave_privada_bytes(llave_privada)
-    llave_publica_bytes = key.convertir_llave_publica_bytes(llave_publica)
-
-    fecha_expiracion = timezone.now() + timedelta(minutes=10)
-
-    user.pubkey = llave_publica_bytes.decode('utf-8')
-    user.privkey = llave_privada_bytes
-    user.date_expire_key = fecha_expiracion
-    user.save()
-
-#Verificar si las llaves ya expiraron
-def obtener_llaves(user_name):
-
-    user = Usuario.objects.get(usuario=user_name)
-
-    if user.date_expire_key and user.date_expire_key < timezone.now():
-      generar_llaves_temporales(user_name)
-      user.refresh_from_db()
-
-
-    
-    
