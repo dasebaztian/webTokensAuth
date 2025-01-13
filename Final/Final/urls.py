@@ -15,8 +15,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.conf.urls import handler400, handler403, handler404, handler500
 from django.urls import path
 from Final import views as vistas
+
+handler400 = 'Final.views.error_400'
+handler403 = 'Final.views.error_403'
+handler404 = 'Final.views.error_404'
+handler500 = 'Final.views.error_500'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', vistas.login),
@@ -25,5 +32,4 @@ urlpatterns = [
     path('generar/', vistas.generar),
     path('firmar/', vistas.firmar),
     path('verificar/', vistas.verificar),
-    path('hora/', vistas.horatest),
 ]

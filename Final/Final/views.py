@@ -12,40 +12,18 @@ from . import hasher as hash
 from . import firmas as firm
 from database.models import Usuario
 
+def error_400(request, exception):
+    return render(request, 'errors/400.html', status=400)
 
-def horatest(request):
-    # Buscar al usuario 'Djak'
-    try:
-        usuario_djak = Usuario.objects.get(usuario='Djak47')  # Suponiendo que 'username' es el campo que identifica al usuario
-        hora_expiracion = usuario_djak.date_expire_key  # Asegúrate de que 'hora_expiracion' es el campo correcto
-    except Usuario.DoesNotExist:
-        hora_expiracion = None
+def error_403(request, exception):
+    return render(request, 'errors/403.html', status=403)
 
-    # Si el usuario existe y tiene una hora de expiración
-    if hora_expiracion:
-        hora_expiracion_local = timezone.localtime(hora_expiracion)
-    else:
-        hora_expiracion_local = "No se encontró la hora de expiración."
+def error_404(request, exception):
+    return render(request, 'errors/404.html', status=404)
 
-    # Obtener la hora actual ajustada a la zona horaria configurada en Django
-    hora_actual = timezone.localtime(timezone.now() + timedelta(minutes=5))
+def error_500(request):
+    return render(request, 'errors/500.html', status=500)
 
-    # Construir la respuesta HTML
-    html = f"""
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <title>Hora Actual y Expiración</title>
-    </head>
-    <body>
-        <h1>Hora actual en Ciudad de México: {hora_actual}</h1>
-        <h2>Hora de expiración del usuario Djak: {hora_expiracion_local}</h2>
-    </body>
-    </html>
-    """
-
-    return HttpResponse(html)
 
 def campo_vacio(campo):
     return campo.strip() == ''
