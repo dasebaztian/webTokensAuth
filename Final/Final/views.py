@@ -300,9 +300,12 @@ def firmar(request):
 def verificar(request):
     t = "verificar.html"
     if request.method == 'POST':
-        archivo = request.FILES['archivo']
-        signature = request.FILES['firma']
+        archivo = request.FILES.get('archivo')
+        signature = request.FILES.get('firma')
         usuario = request.POST.get('usuario', '')
+
+        if not archivo or not signature or not usuario:
+            return render(request, t, {'errores': ['Faltan ingresar datos']})
 
         archivo_binario = archivo.read()
         signature_binario = signature.read()
