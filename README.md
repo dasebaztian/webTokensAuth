@@ -18,6 +18,7 @@ del archivo que proporcionarón.
 + Verificación de archivos, los usuarios pueden subir el archivo
 y la firma generada, junto al nombre de usuario que lo firmó para
 verificar si el archivo es autentico.
++ El sistema es implementado dentro de un servidor Nginx
 
 ## Seguridad
 + La clave privada de cada usuario se almacena cifrada.
@@ -27,4 +28,6 @@ verificar si el archivo es autentico.
 	- Inyección SQL
 	- XSS
 	- CSRF
-	- Directory path transversal 
+	- Directory path transversal
++ El sistema funciona gracias a la conexión de base de datos con MariaDB con estrictas medidas de seguridad.
+
